@@ -1,13 +1,9 @@
 package software.bernie.geckolib3.resource;
 
 import com.eliotlash.molang.MolangParser;
-import net.minecraft.client.resources.AbstractResourcePack;
-import net.minecraft.client.resources.FileResourcePack;
-import net.minecraft.client.resources.FolderResourcePack;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.resources.IResourcePack;
-import net.minecraft.client.resources.LegacyV2Adapter;
+import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
@@ -26,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -130,7 +127,13 @@ public class GeckoLibCache implements IResourceManagerReloadListener
 			Field field = FMLClientHandler.class.getDeclaredField("resourcePackList");
 			field.setAccessible(true);
 
-			return (List<IResourcePack>) field.get(FMLClientHandler.instance());
+			ImmutableList.Builder<IResourcePack> builder = new ImmutableList.Builder<>();
+			builder.addAll((List<IResourcePack>) field.get(FMLClientHandler.instance()));
+			builder.addAll(Minecraft.getMinecraft().getResourcePackRepository()
+					.getRepositoryEntriesAll().stream().map(ResourcePackRepository.Entry::getResourcePack)
+					.collect(Collectors.toList()));
+
+			return builder.build();
 		}
 		catch (Exception e)
 		{
