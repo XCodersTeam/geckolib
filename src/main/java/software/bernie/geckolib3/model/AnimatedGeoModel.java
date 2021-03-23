@@ -134,9 +134,11 @@ public abstract class AnimatedGeoModel<T extends IAnimatable> extends GeoModelPr
 		Minecraft minecraftInstance = Minecraft.getMinecraft();
 		float partialTick = minecraftInstance.getRenderPartialTicks();
 
-		parser.setValue("query.actor_count", minecraftInstance.world.loadedEntityList.size());
-		parser.setValue("query.time_of_day", MolangUtils.normalizeTime(minecraftInstance.world.getTotalWorldTime()));
-		parser.setValue("query.moon_phase", minecraftInstance.world.getMoonPhase());
+		if (minecraftInstance.world != null) {
+			parser.setValue("query.actor_count", minecraftInstance.world.loadedEntityList.size());
+			parser.setValue("query.time_of_day", MolangUtils.normalizeTime(minecraftInstance.world.getTotalWorldTime()));
+			parser.setValue("query.moon_phase", minecraftInstance.world.getMoonPhase());
+		}
 
 		if (animatable instanceof Entity)
 		{
